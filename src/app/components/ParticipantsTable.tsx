@@ -41,16 +41,16 @@ export function ParticipantsTable({
   const colors = ['bg-red-600', 'bg-blue-600', 'bg-yellow-500', 'bg-green-600'];
 
   return (
-    <div className="bg-neutral-900 rounded-xl border border-neutral-700 p-4 sm:p-6 lg:p-8">
-      <div className="flex items-center justify-between mb-4 sm:mb-6">
-        <h2 className="text-lg sm:text-xl font-bold text-white">Planning Table</h2>
+    <div className="bg-neutral-900 rounded-xl border border-neutral-700 p-3 sm:p-4 lg:p-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <h2 className="text-base sm:text-lg lg:text-xl font-bold text-white">Planning Table</h2>
         <div className="text-xs sm:text-sm text-neutral-400">
           {participants.filter(p => p.hasVoted).length} / {participants.length} voted
         </div>
       </div>
 
       {/* Circular Table */}
-      <div className="relative w-full aspect-square max-w-2xl mx-auto min-h-[280px] sm:min-h-[400px]">
+      <div className="relative w-full aspect-square max-w-2xl mx-auto min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
         {/* Table Surface */}
         <div className="absolute inset-[15%] sm:inset-[15%] rounded-full bg-neutral-800 border-2 sm:border-4 border-neutral-700 shadow-2xl">
           <div className="absolute inset-0 flex items-center justify-center">
