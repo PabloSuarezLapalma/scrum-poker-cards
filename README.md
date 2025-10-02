@@ -1,3 +1,45 @@
+# 🃏 Scrum Poker Cards
+
+A modern, real-time collaborative Scrum poker planning application with no login required. Features a dark UNO-inspired theme with minimal colors and bold accents.
+
+## ✨ Features
+
+### � Real-Time Collaboration
+- **Instant Sync**: See other participants join, vote, and select cards in real-time
+- **Room-Based Sessions**: Create or join rooms with unique 6-character codes
+- **Auto-Join**: Users automatically join the session when they enter
+- **Live Presence**: Participants are removed automatically after 10 seconds of inactivity
+- **Cross-Tab Sync**: Works across multiple browser tabs using BroadcastChannel API
+
+### �🎴 Multiple Card Scales
+- **Fibonacci**: 0, 1, 2, 3, 5, 8, 13, 21, ?, ☕
+- **Powers of 2**: 0, 1, 2, 4, 8, 16, 32, 64, ?, ☕
+- **T-Shirt Sizes**: XS, S, M, L, XL, XXL, ?, ☕
+- **Custom Scale**: Create your own card values with add/remove functionality
+
+### 👥 Collaborative Planning
+- Virtual planning table with participants arranged in a circle
+- Users join automatically - no manual participant addition
+- Visual indicators showing who has voted
+- Cards stay face-down until "Reveal Cards" is clicked
+- Start new rounds to reset all votes
+- Color-coded avatars (Red, Blue, Yellow, Green)
+
+### 🎨 UNO-Inspired Dark Theme
+- Pure black background (#000000)
+- Dark neutral UI elements (#171717, #262626, #404040)
+- Bold accent colors: Red (#DC2626), Blue (#2563EB), Yellow (#EAB308), Green (#16A34A)
+- Minimal, clean design with focus on functionality
+
+### � Fully Responsive
+- **Mobile-First Design**: Optimized for all screen sizes
+- **Collapsible Settings**: Settings panel collapses on mobile for better UX
+- **Touch-Friendly**: Large tap targets for cards and buttons
+- **Adaptive Layout**: 1-column mobile, 4-column desktop grid
+- **Scalable Elements**: Cards and avatars scale based on screen size
+
+## 🚀 Getting Started
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

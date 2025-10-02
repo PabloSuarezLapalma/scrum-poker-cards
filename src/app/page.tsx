@@ -1,103 +1,208 @@
-import Image from "next/image";
+'use client';
+
+import { useState, useMemo, useEffect } from 'react';
+import { RoomJoin } from './components/RoomJoin';
+import { Avatar } from './components/Avatar';
+import { PokerCard } from './components/PokerCard';
+import { ScaleSelector, PRESET_SCALES, type ScaleType } from './components/ScaleSelector';
+import { ParticipantsTable } from './components/ParticipantsTable';
+import { useRoomSync } from './hooks/useRoomSync';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [sessionData, setSessionData] = useState<{ roomId: string; userId: string; userName: string } | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showRoomCode, setShowRoomCode] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Generate unique user ID on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !sessionStorage.getItem('userId')) {
+      sessionStorage.setItem('userId', `user-${Date.now()}-${Math.random().toString(36).substring(7)}`);
+    }
+  }, []);
+
+  const userId = typeof window !== 'undefined' ? sessionStorage.getItem('userId') || '' : '';
+
+  const { roomState, updateCard, updateSettings, resetVotes } = useRoomSync(
+    sessionData?.roomId || '',
+    userId,
+    sessionData?.userName || ''
+  );
+
+  const cardValues = useMemo(() => {
+    if (!roomState) return PRESET_SCALES.fibonacci;
+    if (roomState.currentScale === 'custom') {
+      return roomState.customValues.length > 0 ? roomState.customValues : ['?'];
+    }
+    return PRESET_SCALES[roomState.currentScale];
+  }, [roomState]);
+
+  if (!sessionData) {
+    return <RoomJoin onJoinRoom={(roomId, userName) => setSessionData({ roomId, userId, userName })} />;
+  }
+
+  if (!roomState) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-white text-xl">Loading room...</div>
+      </div>
+    );
+  }
+
+  const currentParticipant = roomState.participants.find(p => p.id === userId);
+  const selectedCard = currentParticipant?.selectedCard || null;
+  const allVoted = roomState.participants.length > 0 && roomState.participants.every(p => p.hasVoted);
+
+  const handleCardSelect = (value: string) => {
+    const newCard = value === selectedCard ? null : value;
+    updateCard(newCard, newCard !== null);
+  };
+
+  const handleScaleChange = (scale: ScaleType) => {
+    updateSettings({ currentScale: scale });
+  };
+
+  const handleCustomValuesChange = (values: string[]) => {
+    updateSettings({ customValues: values });
+  };
+
+  const handleRevealCards = () => {
+    updateSettings({ showCards: true });
+  };
+
+  const handleNewRound = () => {
+    resetVotes();
+  };
+
+  const handleLeaveRoom = () => {
+    setSessionData(null);
+  };
+
+  const copyRoomCode = () => {
+    navigator.clipboard.writeText(sessionData.roomId);
+    setShowRoomCode(true);
+    setTimeout(() => setShowRoomCode(false), 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-black p-2 sm:p-4 lg:p-6">
+      {/* Header */}
+      <header className="mb-4 sm:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 max-w-7xl mx-auto">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Avatar name={sessionData.userName} />
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-white">{sessionData.userName}</h2>
+            <button
+              onClick={handleLeaveRoom}
+              className="text-xs sm:text-sm text-neutral-400 hover:text-red-500 underline transition-colors"
+            >
+              Leave Room
+            </button>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            onClick={copyRoomCode}
+            className="px-3 sm:px-4 py-2 bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 rounded-lg text-xs sm:text-sm text-neutral-300 font-mono transition-colors"
+            title="Click to copy"
+          >
+            {showRoomCode ? '✓ Copied!' : `Room: ${sessionData.roomId}`}
+          </button>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white flex items-center gap-2">
+            🃏 <span className="hidden sm:inline">Scrum Poker</span>
+          </h1>
+        </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+        {/* Left Sidebar - Settings */}
+        <div className="lg:col-span-1 space-y-3 sm:space-y-4">
+          {/* Mobile: Collapsible Settings */}
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="lg:hidden w-full px-4 py-3 bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 rounded-xl text-white font-semibold flex items-center justify-between transition-colors"
+          >
+            <span>Settings</span>
+            <svg 
+              className={`w-5 h-5 transition-transform ${showSettings ? 'rotate-180' : ''}`}
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+
+          <div className={`space-y-3 sm:space-y-4 ${showSettings ? 'block' : 'hidden lg:block'}`}>
+            <ScaleSelector
+              currentScale={roomState.currentScale}
+              customValues={roomState.customValues}
+              onScaleChange={handleScaleChange}
+              onCustomValuesChange={handleCustomValuesChange}
+            />
+
+            {/* Action Buttons */}
+            <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-700 space-y-2">
+              <button
+                onClick={handleRevealCards}
+                disabled={!allVoted || roomState.showCards}
+                className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base ${
+                  allVoted && !roomState.showCards
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-neutral-800 text-neutral-500 cursor-not-allowed'
+                }`}
+              >
+                {roomState.showCards ? '✓ Cards Revealed' : 'Reveal Cards'}
+              </button>
+              
+              <button
+                onClick={handleNewRound}
+                className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors text-sm sm:text-base"
+              >
+                New Round
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Center/Right - Participants Table */}
+        <div className="lg:col-span-3">
+          <ParticipantsTable
+            participants={roomState.participants}
+            currentUserId={userId}
+            showCards={roomState.showCards}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </div>
+
+      {/* Bottom - Card Selection */}
+      <div className="max-w-7xl mx-auto mt-4 sm:mt-6">
+        <div className="bg-neutral-900 rounded-xl p-4 sm:p-6 border border-neutral-700">
+          <div className="mb-3 sm:mb-4 text-center">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2">
+              {selectedCard ? 'Your Estimate' : 'Select Your Card'}
+            </h3>
+            {selectedCard && (
+              <div className="inline-block mb-2">
+                <div className="w-20 h-28 sm:w-24 sm:h-32 rounded-xl bg-red-600 shadow-2xl flex items-center justify-center text-white text-4xl sm:text-5xl font-bold">
+                  {selectedCard}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Poker Cards */}
+          <div className="flex flex-wrap justify-center gap-2 sm:gap-3 lg:gap-4">
+            {cardValues.map((value) => (
+              <PokerCard
+                key={value}
+                value={value}
+                isSelected={selectedCard === value}
+                onClick={() => handleCardSelect(value)}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
