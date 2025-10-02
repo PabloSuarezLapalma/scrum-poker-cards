@@ -6,6 +6,7 @@ import { Avatar } from './components/Avatar';
 import { PokerCard } from './components/PokerCard';
 import { ScaleSelector, PRESET_SCALES, type ScaleType } from './components/ScaleSelector';
 import { ParticipantsTable } from './components/ParticipantsTable';
+import { VoteSummary } from './components/VoteSummary';
 import { useRoomSync } from './hooks/useRoomSync';
 
 export default function Home() {
@@ -84,9 +85,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black p-2 sm:p-4 lg:p-6">
+    <div className="min-h-screen bg-black p-2 sm:p-3 lg:p-4">
       {/* Header */}
-      <header className="mb-4 sm:mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 max-w-7xl mx-auto">
+      <header className="mb-3 sm:mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-3 max-w-7xl mx-auto">
         <div className="flex items-center gap-3 sm:gap-4">
           <Avatar name={sessionData.userName} />
           <div>
@@ -113,7 +114,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Left Sidebar - Settings */}
         <div className="lg:col-span-1 space-y-3 sm:space-y-4">
           {/* Mobile: Collapsible Settings */}
@@ -174,16 +175,26 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Vote Summary - Only shown when cards are revealed */}
+      {roomState.showCards && (
+        <div className="max-w-7xl mx-auto mt-3 sm:mt-4">
+          <VoteSummary
+            participants={roomState.participants}
+            showCards={roomState.showCards}
+          />
+        </div>
+      )}
+
       {/* Bottom - Card Selection */}
-      <div className="max-w-7xl mx-auto mt-4 sm:mt-6">
-        <div className="bg-neutral-900 rounded-xl p-4 sm:p-6 border border-neutral-700">
-          <div className="mb-3 sm:mb-4 text-center">
-            <h3 className="text-base sm:text-lg font-bold text-white mb-2">
+      <div className="max-w-7xl mx-auto mt-3 sm:mt-4">
+        <div className="bg-neutral-900 rounded-xl p-3 sm:p-4 border border-neutral-700">
+          <div className="mb-2 sm:mb-3 text-center">
+            <h3 className="text-sm sm:text-base font-bold text-white mb-2">
               {selectedCard ? 'Your Estimate' : 'Select Your Card'}
             </h3>
             {selectedCard && (
               <div className="inline-block mb-2">
-                <div className="w-20 h-28 sm:w-24 sm:h-32 rounded-xl bg-red-600 shadow-2xl flex items-center justify-center text-white text-4xl sm:text-5xl font-bold">
+                <div className="w-16 h-24 sm:w-20 sm:h-28 rounded-xl bg-red-600 shadow-2xl flex items-center justify-center text-white text-3xl sm:text-4xl font-bold">
                   {selectedCard}
                 </div>
               </div>

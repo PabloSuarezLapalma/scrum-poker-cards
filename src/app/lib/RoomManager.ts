@@ -13,8 +13,8 @@ export interface RoomState {
 }
 
 const STORAGE_KEY_PREFIX = 'scrum-poker-room-';
-const HEARTBEAT_INTERVAL = 3000; // 3 seconds
-const PARTICIPANT_TIMEOUT = 10000; // 10 seconds
+const HEARTBEAT_INTERVAL = 2000; // 2 seconds - more responsive
+const PARTICIPANT_TIMEOUT = 8000; // 8 seconds - faster cleanup
 
 export class RoomManager {
   private roomId: string;
