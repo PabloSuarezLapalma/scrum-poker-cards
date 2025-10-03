@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
@@ -28,12 +28,12 @@ const io = new Server(httpServer, {
 const socketHandler = new SocketHandler(io);
 
 // Health check endpoint
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Get room info endpoint (optional, for debugging)
-app.get('/api/rooms/:roomId', (_req, res) => {
+app.get('/api/rooms/:roomId', (_req: Request, res: Response) => {
   // This could be implemented if needed for debugging
   res.json({ message: 'Room info endpoint' });
 });
