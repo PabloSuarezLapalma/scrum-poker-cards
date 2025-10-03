@@ -84,7 +84,7 @@ export class SocketHandler {
     console.log(`User ${userName} (${userId}) joined room ${roomId}`);
   }
 
-  private handleUpdateCard(socket: Socket, payload: UpdateCardPayload): void {
+  private handleUpdateCard(_socket: Socket, payload: UpdateCardPayload): void {
     const { roomId, userId, selectedCard, hasVoted } = payload;
 
     const room = this.roomService.updateCard(roomId, userId, selectedCard, hasVoted);
@@ -95,7 +95,7 @@ export class SocketHandler {
     }
   }
 
-  private handleUpdateSettings(socket: Socket, payload: UpdateSettingsPayload): void {
+  private handleUpdateSettings(_socket: Socket, payload: UpdateSettingsPayload): void {
     const { roomId, ...updates } = payload;
 
     const room = this.roomService.updateSettings(roomId, updates);
@@ -106,7 +106,7 @@ export class SocketHandler {
     }
   }
 
-  private handleResetVotes(socket: Socket, payload: ResetVotesPayload): void {
+  private handleResetVotes(_socket: Socket, payload: ResetVotesPayload): void {
     const { roomId } = payload;
 
     const room = this.roomService.resetVotes(roomId);

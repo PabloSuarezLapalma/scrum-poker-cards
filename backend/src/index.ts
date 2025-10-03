@@ -28,12 +28,12 @@ const io = new Server(httpServer, {
 const socketHandler = new SocketHandler(io);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Get room info endpoint (optional, for debugging)
-app.get('/api/rooms/:roomId', (req, res) => {
+app.get('/api/rooms/:roomId', (_req, res) => {
   // This could be implemented if needed for debugging
   res.json({ message: 'Room info endpoint' });
 });
