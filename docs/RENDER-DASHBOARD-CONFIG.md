@@ -20,9 +20,8 @@ The issue might be that **Render has cached the build command in the dashboard**
 
 4. **Verify Environment Variables**
    - Scroll to "Environment Variables"
-   - Make sure `NODE_ENV` is NOT set to `production` (or remove it)
-   - If it is set, change it to `development` or remove the variable
-   - **Reason:** When `NODE_ENV=production`, npm skips devDependencies by default
+   - `NODE_ENV` can remain set to `production` (this is fine now)
+   - The `build.sh` script uses `npm install --include=dev` which installs devDependencies even in production mode
 
 5. **Manual Deploy**
    - Go to the "Manual Deploy" section
