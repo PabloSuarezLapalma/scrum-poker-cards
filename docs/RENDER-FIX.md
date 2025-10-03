@@ -20,12 +20,27 @@ When Render cloned the repository and ran `npm install` in the backend folder, n
 TypeScript compiler (`tsc`) was then unable to find the type definitions because it was looking in the wrong node_modules folder.
 
 ## Solution
+
+### Fix 1: Disable npm workspace hoisting (backend/.npmrc)
 Created `backend/.npmrc` with:
 ```
 workspaces=false
 ```
 
 This tells npm to ignore the workspace configuration when installing dependencies in the backend folder, ensuring all packages (including `@types/express`) are installed locally in `backend/node_modules`.
+
+### Fix 2: Configure TypeScript to check multiple type locations (backend/tsconfig.json)
+Added `typeRoots` configuration to handle cases where npm still hoists dependencies:
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "../node_modules/@types"]
+  }
+}
+```
+
+This allows TypeScript to find type definitions whether they're installed locally (`./node_modules/@types`) or hoisted to the parent folder (`../node_modules/@types`).
 
 ## Changes Made
 1. **backend/.npmrc** (new file)
@@ -59,9 +74,11 @@ npm run build
 4. Test the full application end-to-end
 
 ## Files Changed
-- `backend/.npmrc` (new)
-- `render.yaml`
-- `backend/src/index.ts`
-- `backend/src/handlers/socket.handler.ts`
+- `backend/.npmrc` (new) - Disable workspace hoisting
+- `backend/tsconfig.json` - Add typeRoots for fallback type resolution
+- `render.yaml` - Updated build command
+- `backend/src/index.ts` - Add explicit Express types
+- `backend/src/handlers/socket.handler.ts` - Fix unused parameters
 
 Created: October 2, 2025
+Last Updated: October 2, 2025 (Added typeRoots fix)
