@@ -4,13 +4,14 @@ A modern, real-time collaborative Scrum poker planning application with no login
 
 ## ✨ Features
 
-### � Real-Time Collaboration
-- **Instant Sync**: See other participants join, vote, and select cards in real-time with 2-second heartbeat
+### 🌐 Real-Time Collaboration
+- **WebSocket Communication**: True real-time sync using Socket.IO across different devices and networks
 - **Room-Based Sessions**: Create or join rooms with unique 6-character codes
 - **Auto-Join**: Users automatically join the session when they enter
-- **Live Presence**: Participants are removed automatically after 8 seconds of inactivity
-- **Cross-Tab Sync**: Works across multiple browser tabs using BroadcastChannel API
-- **Optimized Concurrency**: Improved real-time updates for better multi-user experience
+- **Live Presence**: Participants are removed automatically after 30 seconds of inactivity
+- **Cross-Device Sync**: Works across any device - phones, tablets, desktops
+- **Instant Updates**: See votes, participants, and settings update in real-time
+- **Auto Reconnection**: Automatically reconnects if connection is lost
 
 ### �🎴 Multiple Card Scales
 - **Fibonacci**: 0, 1, 2, 3, 5, 8, 13, 21, ?, ☕
@@ -44,39 +45,137 @@ A modern, real-time collaborative Scrum poker planning application with no login
 
 ## 🚀 Getting Started
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Prerequisites
+- Node.js 18+ installed
+- npm or yarn package manager
 
-## Getting Started
+### Installation
 
-First, run the development server:
-
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd scrum-poker-cards
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install all dependencies (frontend + backend)**
+```bash
+npm run install:all
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Configure environment variables**
 
+Create `.env.local` in the root directory:
+```bash
+cp .env.example .env.local
+```
 
+Create `.env` in the server directory:
+```bash
+cp server/.env.example server/.env
+```
 
-## Learn More
+4. **Start the development servers**
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+This will start:
+- Frontend (Next.js) on [http://localhost:3000](http://localhost:3000)
+- Backend (Socket.IO) on [http://localhost:3001](http://localhost:3001)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+scrum-poker-cards/
+├── src/                    # Frontend Next.js app
+│   ├── app/
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom React hooks
+│   │   └── lib/           # RoomManager (Socket.IO client)
+├── server/                 # Backend WebSocket server
+│   └── src/
+│       ├── handlers/       # Socket event handlers
+│       ├── services/       # Business logic
+│       └── types/          # TypeScript types
+└── public/                 # Static assets
+```
 
-## Deploy on Vercel
+## 📡 Technology Stack
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Frontend
+- **Next.js 15**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **Socket.IO Client**: WebSocket communication
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Backend
+- **Express**: HTTP server
+- **Socket.IO**: Real-time bidirectional communication
+- **TypeScript**: Type-safe backend
+- **In-Memory Storage**: Fast room state management
+
+## 🔧 Development
+
+### Run Frontend Only
+```bash
+npm run dev:frontend
+```
+
+### Run Backend Only
+```bash
+npm run dev:backend
+```
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Start Production Servers
+```bash
+npm start
+```
+
+## 📚 Documentation
+
+- [Usage Guide](./USAGE.md) - How to use the application
+- [Implementation Details](./IMPLEMENTATION.md) - Technical implementation
+- [Backend Server](./server/README.md) - Backend documentation
+
+## 🌐 Deployment
+
+### Frontend (Vercel)
+```bash
+vercel deploy
+```
+
+Set environment variable:
+- `NEXT_PUBLIC_SOCKET_URL`: Your backend WebSocket URL
+
+### Backend (Heroku/Railway/Render)
+```bash
+cd server
+git subtree push --prefix server heroku main
+```
+
+Set environment variables:
+- `PORT`: Server port
+- `FRONTEND_URL`: Your frontend URL for CORS
+- `NODE_ENV`: production
+
+## 🧪 Testing Real-Time Features
+
+1. Open app in multiple browsers/devices
+2. Create a room in one browser
+3. Copy the room code
+4. Join with the same code from other browsers
+5. Select cards and see instant sync
+6. Test reveal cards and new round features
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+MIT License - feel free to use this project for any purpose.

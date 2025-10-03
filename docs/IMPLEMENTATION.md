@@ -2,18 +2,26 @@
 
 ## 🎯 Key Changes
 
-### 1. Real-Time Multi-User System
-- **RoomManager.ts**: Core real-time sync engine
-  - Uses localStorage for state persistence
-  - BroadcastChannel API for same-browser tab communication
-  - Storage events for cross-browser synchronization
-  - Heartbeat system (3s intervals) to detect active users
-  - Auto-cleanup of inactive users (10s timeout)
+### 1. WebSocket-Based Real-Time System
+- **Backend Server (Express + Socket.IO)**:
+  - Centralized room state management
+  - WebSocket connections for instant updates
+  - Heartbeat system (5s intervals) to detect active users
+  - Auto-cleanup of inactive users (30s timeout)
+  - Room cleanup after 1 hour of inactivity
+  - CORS configuration for cross-origin support
 
-- **useRoomSync.ts**: React hook for room state management
-  - Subscribes to room updates
-  - Provides updateCard, updateSettings, resetVotes methods
-  - Auto-joins room on mount, leaves on unmount
+- **Frontend Client (Socket.IO Client)**:
+  - **RoomManager.ts**: WebSocket client wrapper
+    - Connects to backend via Socket.IO
+    - Handles reconnection automatically
+    - Emits user actions (join, vote, settings)
+    - Receives real-time state updates
+  
+  - **useRoomSync.ts**: React hook for room state management
+    - Subscribes to room updates
+    - Provides updateCard, updateSettings, resetVotes methods
+    - Auto-joins room on mount, leaves on unmount
 
 ### 2. Room-Based Sessions
 - **RoomJoin.tsx**: Entry point for users
@@ -80,15 +88,21 @@
 ## 🔄 Real-Time Sync Flow
 
 ```
-User A                    localStorage                 User B
+User A                    Backend Server              User B
   |                            |                          |
-  |--[Select Card]------------>|                          |
-  |                            |--[Storage Event]-------->|
-  |                            |                          |--[Update UI]
-  |                            |<-----[Heartbeat]---------|
-  |--[Heartbeat]-------------->|                          |
-  |                            |--[Broadcast Channel]---->|
-  |<--[State Update]-----------+--[State Update]--------->|
+  |--[WebSocket Connect]------>|                          |
+  |                            |<--[WebSocket Connect]----|
+  |--[join-room]-------------->|                          |
+  |                            |--[room-state]---------->|
+  |<--[room-state]-------------|                          |
+  |                            |                          |
+  |--[update-card]------------>|                          |
+  |                            |--[room-state]---------->|  (Broadcast)
+  |<--[room-state]-------------|                          |
+  |                            |                          |
+  |<--[heartbeat-check]--------|--[heartbeat-check]----->|
+  |--[heartbeat]-------------->|                          |
+  |                            |<--[heartbeat]-----------|
 ```
 
 ## 🎨 Theme Colors
@@ -119,13 +133,27 @@ Accents:
 6. **User inactive > 10s** → Auto-removed from participants
 7. **User closes tab** → Leave room cleanup
 
-## 📦 New Files Created
+## 📦 Project Structure
 
 ```
-src/app/
-  ├── lib/
-  │   └── RoomManager.ts          # Core real-time sync logic
-  ├── hooks/
+scrum-poker-cards/
+├── src/app/
+│   ├── lib/
+│   │   └── RoomManager.ts          # Socket.IO client wrapper
+│   ├── hooks/
+│   │   └── useRoomSync.ts          # React hook for room state
+│   └── components/                  # React components
+├── server/                          # Backend WebSocket server
+│   └── src/
+│       ├── index.ts                # Express + Socket.IO server
+│       ├── handlers/
+│       │   └── socket.handler.ts   # WebSocket event handlers
+│       ├── services/
+│       │   └── room.service.ts     # Room state management
+│       └── types/
+│           └── room.types.ts       # TypeScript interfaces
+├── .env.local                       # Frontend environment variables
+└── server/.env                      # Backend environment variables
   │   └── useRoomSync.ts          # React hook for room state
   └── components/
       └── RoomJoin.tsx            # Room creation/join UI
@@ -134,11 +162,16 @@ src/app/
 ## 🎯 Testing Scenarios
 
 1. **Single User**: Open app, create room, select cards
-2. **Multiple Users**: 
+2. **Multiple Users (Same Network)**: 
    - User A creates room, gets code "ABC123"
    - User B joins with code "ABC123"
    - Both see each other's avatar and votes in real-time
-3. **Multi-Tab**: Open same room in 2 tabs, see sync
-4. **Inactivity**: Keep one tab idle, it disappears after 10s
-5. **Mobile**: Test on phone, verify collapsible settings work
-6. **Responsive**: Resize browser, verify layout adapts
+3. **Cross-Device Sync**: 
+   - Open on phone and desktop
+   - Join same room
+   - See instant synchronization
+4. **Multi-Tab**: Open same room in 2 tabs, see sync
+5. **Inactivity**: Keep one user idle, they disappear after 30s
+6. **Reconnection**: Disconnect internet, reconnect, see auto-rejoin
+7. **Mobile**: Test on phone, verify collapsible settings work
+8. **Responsive**: Resize browser, verify layout adapts
