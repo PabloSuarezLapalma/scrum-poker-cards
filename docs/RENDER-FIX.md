@@ -76,9 +76,11 @@ npm run build
 ## Files Changed
 - `backend/.npmrc` (new) - Disable workspace hoisting
 - `backend/tsconfig.json` - Add typeRoots for fallback type resolution
-- `render.yaml` - Updated build command
+- `render.yaml` - Updated build command to use `bash build.sh`
+- `backend/render.yaml` - Updated build command to use `bash build.sh`
+- `backend/build.sh` - Made executable (chmod +x)
 - `backend/src/index.ts` - Add explicit Express types
 - `backend/src/handlers/socket.handler.ts` - Fix unused parameters
 
 Created: October 2, 2025
-Last Updated: October 2, 2025 (Added typeRoots fix)
+Last Updated: October 3, 2025 (Fixed build.sh permissions and render.yaml)
